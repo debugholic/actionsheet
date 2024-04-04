@@ -72,7 +72,7 @@ public class ActionSheetViewController: UIViewController {
     var tableViewLayerView: UIView?
     
     public var cellHeight: CGFloat = 48.0
-    
+        
     convenience public init(data: [any ActionSheetItem]?) {
         self.init(nibName: nil, bundle: nil)
         self.data = data
@@ -85,6 +85,7 @@ public class ActionSheetViewController: UIViewController {
     override public init(nibName nibNameOrNil: String!, bundle nibBundleOrNil: Bundle!) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         transitioningDelegate = self
+        modalPresentationStyle = .overFullScreen
     }
 
     public override func viewDidLoad() {
@@ -95,17 +96,18 @@ public class ActionSheetViewController: UIViewController {
         if let selected = selected {
             tableView.selectRow(at: IndexPath(row: selected, section: 0), animated: false, scrollPosition: .none)
         }
-
     }
     
     public override func loadView() {
         super.loadView()
         tableViewHeight = tableView.heightAnchor.constraint(equalToConstant: .zero)
+  
         let dimView = UIView()
         view.addSubview(dimView)
         view.sendSubviewToBack(dimView)
         dimView.translatesAutoresizingMaskIntoConstraints = false
         dimView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        
         NSLayoutConstraint.activate([
             dimView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             dimView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -113,10 +115,13 @@ public class ActionSheetViewController: UIViewController {
             dimView.topAnchor.constraint(equalTo: view.topAnchor)
         ])
         layerView.layer.cornerRadius = 9
-    }
         
-    @IBAction func touchUpInside(_ sender: UIView) {
-        self.dismiss(animated: true, completion:nil)
+        dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
+    }
+    
+    @objc
+    func handleTap(_ gesture: UITapGestureRecognizer) {
+        dismiss(animated: true, completion:nil)
     }
 }
 
